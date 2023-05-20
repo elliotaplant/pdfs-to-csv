@@ -1,0 +1,8 @@
+{
+  "name": "pdf-layout-text-stripper",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/elliotaplant/pdfs-to-csv.git",
+  "author": "Elliot Plant <elliotaplant@gmail.com>",
+  "license": "MIT"
+}
