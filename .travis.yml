@@ -1,0 +1,8 @@
+services:
+  - docker
+
+before_install:
+  - docker build -t pdf-layout-text-stripper .
+
+script:
+  - docker run -v $(pwd):/app pdf-layout-text-stripper "sample.pdf" | grep -q "08    09 19  29  39  49  59       09  19  29  39  49 59      10 30  50"
