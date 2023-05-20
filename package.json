@@ -4,5 +4,11 @@
   "main": "index.js",
   "repository": "https://github.com/elliotaplant/pdfs-to-csv.git",
   "author": "Elliot Plant <elliotaplant@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.1"
+  }
 }
