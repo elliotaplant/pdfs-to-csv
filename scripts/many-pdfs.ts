@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import axios from 'axios';
 import { exec } from 'child_process';
 import path from 'path';
+import { convertPdfToTextFromPdfCo } from './pdf.co';
 
 // Environment Variables
 const PDF_CO_API_KEY = process.env.PDF_CO_API_KEY;
@@ -63,7 +64,7 @@ async function main(): Promise<void> {
     } else {
       // If failed, try extracting text with PDF.co and calling GPT-4 again
       console.log('  Failed to find values from Docker Run results, trying with PDF.co...');
-      const layedOutText = await getPdfLayoutTextFromPdfCo(pdfFilePath);
+      const layedOutText = await convertPdfToTextFromPdfCo(PDF_CO_API_KEY, pdfFilePath);
       console.log('  Got layedOutText from PDF.co');
       result = await callOpenAI(layedOutText, promptTemplate, jsonSchemaStr);
       console.log('  GPT-4 API called successfully. Result:');
@@ -94,23 +95,6 @@ async function getPdfLayoutTextFromDockerRun(pdfFilePath: string) {
       console.log(`  Docker process exited with code ${code} and signal ${signal}`);
     });
   });
-}
-
-async function getPdfLayoutTextFromPdfCo(pdfFilePath: string) {
-  const res = await axios.post(
-    'https://api.pdf.co/v1/pdf/convert/to/text',
-    {
-      url: pdfFilePath,
-      inline: true,
-      ocr: true,
-    },
-    {
-      headers: {
-        'x-api-key': PDF_CO_API_KEY,
-      },
-    },
-  );
-  return res.data;
 }
 
 async function callOpenAI(
