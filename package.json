@@ -6,9 +6,11 @@
   "author": "Elliot Plant <elliotaplant@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@digitak/esrun": "^3.2.24",
     "axios": "^1.4.0"
   },
   "devDependencies": {
-    "@types/node": "^20.2.1"
+    "@types/node": "^20.2.1",
+    "prettier": "^2.8.8"
   }
 }

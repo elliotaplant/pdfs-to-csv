@@ -6,9 +6,15 @@ import path from 'path';
 const PDF_CO_API_KEY = process.env.PDF_CO_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-const WORKING_DIR = './working'
+const WORKING_DIR = './working';
 
 async function main(): Promise<void> {
+  if (process.argv.length !== 5) {
+    throw new Error(
+      '3 args required: <prompt template file> <json schema file> <PDF files directory>',
+    );
+  }
+
   const promptTemplate = await fs.readFile(process.argv[2], 'utf-8');
   const jsonSchemaStr = await fs.readFile(process.argv[3], 'utf-8');
   const jsonSchema = JSON.parse(jsonSchemaStr);
@@ -31,10 +37,10 @@ async function main(): Promise<void> {
   }
 
   const keys = Object.keys(jsonSchema);
-  await fs.appendFile(`${WORKING_DIR}/output.tsv`, keys.join('\t') + '\n');
-  
+  await fs.writeFile(`${WORKING_DIR}/output.tsv`, keys.join('\t') + '\n');
+
   const files = await fs.readdir(dirPath);
-  for (const file of files.filter(f => f.endsWith('.pdf'))) {
+  for (const file of files.filter((f) => f.endsWith('.pdf'))) {
     const pdfFilePath = path.join(dirPath, file);
     const layedOutText = await extractValues(pdfFilePath);
     const result = await callOpenAI(layedOutText, promptTemplate, jsonSchema);
@@ -62,44 +68,61 @@ async function extractValues(pdfFilePath: string) {
   return text;
 }
 
-
-async function getPdfLayoutTextFromDockerRun(pdfFilePath:string) {
+async function getPdfLayoutTextFromDockerRun(pdfFilePath: string) {
   return new Promise<string>((resolve, reject) => {
-    exec(`docker run -v $(pwd):/app madnight/pdf-layout-text-stripper ${pdfFilePath}`, (error, stdout) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(stdout);
-      }
-    });
+    exec(
+      `docker run -v $(pwd):/app madnight/pdf-layout-text-stripper ${pdfFilePath}`,
+      (error, stdout) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(stdout);
+        }
+      },
+    );
   });
 }
 
-async function getPdfLayoutTextFromPdfCo(pdfFilePath:string) {
-  const res = await axios.post('https://api.pdf.co/v1/pdf/convert/to/text', {
-    url: pdfFilePath,
-    inline: true,
-    ocr: true
-  }, {
-    headers: {
-      'x-api-key': PDF_CO_API_KEY
-    }
-  });
+async function getPdfLayoutTextFromPdfCo(pdfFilePath: string) {
+  const res = await axios.post(
+    'https://api.pdf.co/v1/pdf/convert/to/text',
+    {
+      url: pdfFilePath,
+      inline: true,
+      ocr: true,
+    },
+    {
+      headers: {
+        'x-api-key': PDF_CO_API_KEY,
+      },
+    },
+  );
   return res.data;
 }
 
 async function callOpenAI(layedOutText: string, promptTemplate: string, jsonSchema: string) {
-  const prompt = `${promptTemplate}\n${jsonSchema}\n${layedOutText}`;
-  const res = await axios.post('https://api.openai.com/v1/engines/davinci-codex/completions', {
-    prompt,
-    max_tokens: 64
-  }, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`
-    }
-  });
-  return res.data.choices[0].text.trim();
+  const prompt = [
+    {
+      role: 'user',
+      content: promptTemplate
+        .replace('{{ schema }}', jsonSchema)
+        .replace('{{ layedOutPdf }}', layedOutText),
+    },
+  ];
+  const res = await axios.post(
+    'https://api.openai.com/v1/engines/gpt-4.0-turbo/chat/completions',
+    {
+      messages: prompt,
+      max_tokens: 64,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      },
+    },
+  );
+  return res.data.choices[0].message.content.trim();
 }
 
 function isTextGarbled(text: string): boolean {
@@ -116,6 +139,5 @@ function isTextGarbled(text: string): boolean {
   // If more than half of the characters are non-standard ASCII, the text is "garbled"
   return nonAsciiChars / totalChars > 0.5;
 }
-
 
 main().catch(console.error);
