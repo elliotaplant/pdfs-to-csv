@@ -3,23 +3,28 @@ import axios from 'axios';
 import { exec } from 'child_process';
 import path from 'path';
 
+// Environment Variables
 const PDF_CO_API_KEY = process.env.PDF_CO_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
+// Working directory
 const WORKING_DIR = './working';
 
 async function main(): Promise<void> {
+  // Command line arguments validation
   if (process.argv.length !== 5) {
     throw new Error(
       '3 args required: <prompt template file> <json schema file> <PDF files directory>',
     );
   }
 
+  // Reading template and schema
   const promptTemplate = await fs.readFile(process.argv[2], 'utf-8');
   const jsonSchemaStr = await fs.readFile(process.argv[3], 'utf-8');
-  const jsonSchema = JSON.parse(jsonSchemaStr);
+  const jsonSchema: { properties: any } = JSON.parse(jsonSchemaStr);
   const dirPath = process.argv[4];
 
+  // Arguments validation
   if (!promptTemplate) {
     throw new Error('Prompt template path required as 1st arg');
   }
@@ -36,50 +41,58 @@ async function main(): Promise<void> {
     throw new Error('OPENAI_API_KEY required as env variable');
   }
 
-  const keys = Object.keys(jsonSchema);
+  // Initialize output.tsv
+  const keys = Object.keys(jsonSchema.properties);
   await fs.writeFile(`${WORKING_DIR}/output.tsv`, keys.join('\t') + '\n');
+  console.log('Output file initialized.');
 
+  // Process all PDFs
   const files = await fs.readdir(dirPath);
   for (const file of files.filter((f) => f.endsWith('.pdf'))) {
     const pdfFilePath = path.join(dirPath, file);
-    const layedOutText = await extractValues(pdfFilePath);
-    const result = await callOpenAI(layedOutText, promptTemplate, jsonSchema);
-    await fs.appendFile(`${WORKING_DIR}/output.tsv`, Object.values(result).join('\t') + '\n');
-  }
-}
+    console.log('Processing', pdfFilePath);
 
-async function extractValues(pdfFilePath: string) {
-  let text = '';
-  try {
-    text = await getPdfLayoutTextFromDockerRun(pdfFilePath);
-    if (!text || text.length === 0 || isTextGarbled(text)) {
-      throw new Error('No text, empty text, or garbled text from Docker Run');
+    let result: object = {};
+    // Try extracting text with Docker Run and calling GPT-4
+    const layedOutText = await getPdfLayoutTextFromDockerRun(pdfFilePath);
+    console.log('  Got layedOutText from Docker Run');
+    result = await callOpenAI(layedOutText, promptTemplate, jsonSchemaStr);
+    if (gotValues(result)) {
+      console.log('  GPT-4 API called successfully. Result:');
+      console.log('  ', JSON.stringify(result));
+    } else {
+      // If failed, try extracting text with PDF.co and calling GPT-4 again
+      console.log('  Failed to find values from Docker Run results, trying with PDF.co...');
+      const layedOutText = await getPdfLayoutTextFromPdfCo(pdfFilePath);
+      console.log('  Got layedOutText from PDF.co');
+      result = await callOpenAI(layedOutText, promptTemplate, jsonSchemaStr);
+      console.log('  GPT-4 API called successfully. Result:');
+      console.log('  ', JSON.stringify(result));
     }
-  } catch {
-    try {
-      text = await getPdfLayoutTextFromPdfCo(pdfFilePath);
-      if (!text || text.length === 0 || isTextGarbled(text)) {
-        throw new Error('No text, empty text, or garbled text from PDF.co');
-      }
-    } catch {
-      text = '';
-    }
+
+    await fs.appendFile(`${WORKING_DIR}/output.tsv`, Object.values(result).join('\t') + '\n');
+    console.log('  Done');
   }
-  return text;
 }
 
 async function getPdfLayoutTextFromDockerRun(pdfFilePath: string) {
   return new Promise<string>((resolve, reject) => {
-    exec(
-      `docker run -v $(pwd):/app madnight/pdf-layout-text-stripper ${pdfFilePath}`,
-      (error, stdout) => {
+    const child = exec(
+      `docker run -v $(pwd):/app pdf-layout-text-stripper ${pdfFilePath}`,
+      { timeout: 60000 }, // Timeout after 60 seconds
+      (error, stdout, stderr) => {
         if (error) {
+          console.error(`stderr: ${stderr}`);
           reject(error);
         } else {
-          resolve(stdout);
+          resolve(stdout.trim());
         }
       },
     );
+
+    child.on('exit', (code, signal) => {
+      console.log(`  Docker process exited with code ${code} and signal ${signal}`);
+    });
   });
 }
 
@@ -100,44 +113,41 @@ async function getPdfLayoutTextFromPdfCo(pdfFilePath: string) {
   return res.data;
 }
 
-async function callOpenAI(layedOutText: string, promptTemplate: string, jsonSchema: string) {
+async function callOpenAI(
+  layedOutText: string,
+  promptTemplate: string,
+  jsonSchemaStr: string,
+): Promise<{ success: boolean }> {
   const prompt = [
     {
       role: 'user',
       content: promptTemplate
-        .replace('{{ schema }}', jsonSchema)
+        .replace('{{ schema }}', jsonSchemaStr)
         .replace('{{ layedOutPdf }}', layedOutText),
     },
   ];
   const res = await axios.post(
-    'https://api.openai.com/v1/engines/gpt-4.0-turbo/chat/completions',
+    'https://api.openai.com/v1/chat/completions',
+
     {
+      model: 'gpt-4',
       messages: prompt,
-      max_tokens: 64,
+      max_tokens: 400,
     },
     {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
+      timeout: 2 * 60 * 1000, // 2 minute timeout
     },
   );
-  return res.data.choices[0].message.content.trim();
+  const jsonFormattedResponse = res.data.choices[0].message.content.trim();
+  return JSON.parse(jsonFormattedResponse);
 }
 
-function isTextGarbled(text: string): boolean {
-  const totalChars = text.length;
-  let nonAsciiChars = 0;
-
-  for (let i = 0; i < totalChars; i++) {
-    const ascii = text.charCodeAt(i);
-    if (ascii < 32 || ascii > 126) {
-      nonAsciiChars++;
-    }
-  }
-
-  // If more than half of the characters are non-standard ASCII, the text is "garbled"
-  return nonAsciiChars / totalChars > 0.5;
+function gotValues(openAiResult: object) {
+  return Object.values(openAiResult).filter(Boolean).length > 0;
 }
 
 main().catch(console.error);

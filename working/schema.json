@@ -42,5 +42,6 @@
       "description": "The three digit currency code for the total amount due",
       "pattern": "^[A-Z]{3}$"
     }
-  }
+  },
+  "required": ["success"]
 }
