@@ -53,12 +53,16 @@ async function main(): Promise<void> {
     const pdfFilePath = path.join(dirPath, file);
     console.log('Processing', pdfFilePath);
 
-    let result: object = {};
+    let result: object | null = null;
     // Try extracting text with Docker Run and calling GPT-4
-    const layedOutText = await getPdfLayoutTextFromDockerRun(pdfFilePath);
-    console.log('  Got layedOutText from Docker Run');
-    result = await callOpenAI(layedOutText, promptTemplate, jsonSchemaStr);
-    if (gotValues(result)) {
+    try {
+      const layedOutText = await getPdfLayoutTextFromDockerRun(pdfFilePath);
+      console.log('  Got layedOutText from Docker Run');
+      result = await callOpenAI(layedOutText, promptTemplate, jsonSchemaStr);
+    } catch (error) {
+      console.log('  Failed to get layedOutText from Docker Run');
+    }
+    if (result && gotValues(result)) {
       console.log('  GPT-4 API called successfully. Result:');
       console.log('  ', JSON.stringify(result));
     } else {
