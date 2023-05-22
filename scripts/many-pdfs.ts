@@ -53,26 +53,48 @@ async function main(): Promise<void> {
     const pdfFilePath = path.join(dirPath, file);
     console.log('Processing', pdfFilePath);
 
+    let layedOutText: string = '';
     let result: object | null = null;
-    // Try extracting text with Docker Run and calling GPT-4
+
+    const textCachePath = `${WORKING_DIR}/cache/${path.basename(file, '.pdf')}.txt`;
+
+    // Check for cached text file
     try {
-      const layedOutText = await getPdfLayoutTextFromDockerRun(pdfFilePath);
-      console.log('  Got layedOutText from Docker Run');
-      result = await callOpenAI(layedOutText, promptTemplate, jsonSchemaStr);
-    } catch (error) {
-      console.log('  Failed to get layedOutText from Docker Run');
+      layedOutText = await fs.readFile(textCachePath, 'utf-8');
+      console.log('  Loaded text from cache');
+    } catch {
+      console.log('  Cache miss, extracting text');
     }
-    if (result && gotValues(result)) {
-      console.log('  GPT-4 API called successfully. Result:');
-      console.log('  ', JSON.stringify(result));
-    } else {
-      // If failed, try extracting text with PDF.co and calling GPT-4 again
-      console.log('  Failed to find values from Docker Run results, trying with PDF.co...');
-      const layedOutText = await convertPdfToTextFromPdfCo(PDF_CO_API_KEY, pdfFilePath);
-      console.log('  Got layedOutText from PDF.co');
+
+    if (layedOutText) {
       result = await callOpenAI(layedOutText, promptTemplate, jsonSchemaStr);
-      console.log('  GPT-4 API called successfully. Result:');
-      console.log('  ', JSON.stringify(result));
+    }
+
+    if (!result || !gotValues(result)) {
+      // Try extracting text with Docker Run and calling GPT-4
+      try {
+        layedOutText = await getPdfLayoutTextFromDockerRun(pdfFilePath);
+        console.log('  Got layedOutText from Docker Run');
+        result = await callOpenAI(layedOutText, promptTemplate, jsonSchemaStr);
+      } catch (error) {
+        console.log('  Failed to get layedOutText from Docker Run');
+      }
+      if (result && gotValues(result)) {
+        await fs.writeFile(textCachePath, layedOutText);
+        console.log('  Text cached for future use');
+        console.log('  GPT-4 API called successfully. Result:');
+        console.log('  ', JSON.stringify(result));
+      } else {
+        // If failed, try extracting text with PDF.co and calling GPT-4 again
+        console.log('  Failed to find values from Docker Run results, trying with PDF.co');
+        layedOutText = await convertPdfToTextFromPdfCo(PDF_CO_API_KEY, pdfFilePath);
+        console.log('  Got layedOutText from PDF.co');
+        await fs.writeFile(textCachePath, layedOutText);
+        console.log('  Text cached for future use');
+        result = await callOpenAI(layedOutText, promptTemplate, jsonSchemaStr);
+        console.log('  GPT-4 API called successfully. Result:');
+        console.log('  ', JSON.stringify(result));
+      }
     }
 
     await fs.appendFile(`${WORKING_DIR}/output.tsv`, Object.values(result).join('\t') + '\n');

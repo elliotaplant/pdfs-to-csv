@@ -2,3 +2,4 @@ samples
 node_modules
 .envrc
 working/**/*.pdf
+working/cache/*
