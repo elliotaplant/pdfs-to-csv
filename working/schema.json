@@ -4,7 +4,7 @@
   "properties": {
     "Vendor": {
       "type": "string",
-      "description": "The name of the vendor company who issued the invoice, not 'Topline'. Sometimes the vendor name is present in the email address of the company who issued the invoice, not emails with the '@growtopline.com' domain"
+      "description": "The name of the vendor company who issued the invoice, not 'Topline'"
     },
     "Description": {
       "type": "string",
@@ -16,7 +16,7 @@
     },
     "From Email": {
       "type": "string",
-      "description": "The email address of the company who issued the invoice, not emails with the '@growtopline.com' domain",
+      "description": "The email address of the company who issued the invoice, not emails with 'growtopline.com'",
       "format": "email"
     },
     "From Address": {
