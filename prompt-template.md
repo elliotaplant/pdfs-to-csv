@@ -1,4 +1,5 @@
-Act as a PDF value extraction tool. Extract the following fields into an object with this schema:
+Act as a PDF value extraction tool.
+Extract the following fields into an object with this schema:
 
 ```
 {{ schema }}

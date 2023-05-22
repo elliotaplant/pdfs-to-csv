@@ -4,19 +4,19 @@
   "properties": {
     "Vendor": {
       "type": "string",
-      "description": "The name of the vendor who issued the invoice"
+      "description": "The name of the vendor company who issued the invoice, not ‘Topline’"
     },
     "Description": {
       "type": "string",
-      "description": "A description of what the invoice is for"
+      "description": "A description of what the invoice is for, sometimes includes a summary of specific line items in the invoice"
     },
     "Invoice Number": {
       "type": "string",
-      "description": "An alphanumeric identifier for the invoice"
+      "description": "An alphanumeric identifier for the invoice or receipt"
     },
     "From Email": {
       "type": "string",
-      "description": "The email address of the company who issued the invoice",
+      "description": "The email address of the company who issued the invoice, not the email address of the receipt which has the growtopline.com domain",
       "format": "email"
     },
     "From Address": {
@@ -33,9 +33,14 @@
       "description": "The date payment is due, or the date issued if the payment is due upon receipt",
       "format": "date"
     },
-    "Amount": {
+    "Payment Status": {
+      "type": "string",
+      "enum": ["PAID", "UNPAID"],
+      "description": "The status of whether or not an invoice has been paid"
+    },
+    "Invoice Amount": {
       "type": "number",
-      "description": "The numeric amount for the total amount due for the invoice with two decimal places"
+      "description": "The numeric value for the total amount of the invoice with two decimal places, if paid should include the total amount before payment"
     },
     "Currency": {
       "type": "string",

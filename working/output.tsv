@@ -1,15 +1,14 @@
-Vendor	Description	Invoice Number	From Email	From Address	Date Issued	Payment Due Date	Amount	Currency
-PINS Advantage	Annual Subscription - Level 2, User Onboarding - Public Entity, Insured Import	20211210-155948991	mbrooks@pinsadvantage.com	973 W Laurel St San Diego, CA 92101	2021-12-10		8500	USD
-Crunchbase Inc.	Crunchbase Starter Annual Subscription	INV00604451	billing@crunchbase.com	564 Market Street, Suite 700, San Francisco, CA 94104	2023-02-15	2023-02-15	348	USD
-Datadog	Datadog Subscription (01-APR-2023 - 30-APR-2023)	ahm6vf3s	success@datadoghq.com	Datadog, Inc., 620 8th Avenue 45th floor, New York, NY 10018	2023-05-09	2023-05-09	12.74	USD
-DigitalOcean LLC	Final invoice for the April 2023 billing period	457199991	elliot@growtopline.com	101 Avenue of the Americas, 2nd Floor, New York, NY 10013	2023-05-01	2023-05-01	837.32	USD
-Dwolla, Inc.	Platform Fee	I-WJLXBRZ	accounting@dwolla.com	909 Locust St Suite 201, Des Moines, IA 50309	2023-05-08	2023-05-08	1250.7	USD
-Figma, Inc.	Professional FigJam seats (monthly), Professional Figma design seats (monthly)	054FF40B 0018	support@figma.com	760 Market Street, Floor 10, San Francisco, California 94102, United States	2023-05-02	2023-05-02	99.23	USD
-Avangate Inc dba 2Checkout	GlockApps Inbox Insight Monthly Subscription v2 Basic	BI56623780	info@2checkout.com	11700 Great Oaks Way no. 210, 30022, Alpharetta, Georgia, United States of America	2023-05-06	2023-05-06	65.05	USD
-HubSpot Inc.	Sales Hub Professional (Includes 5 Users) Charge for: 4/27/2023 - 5/26/2023	10961084	billing@hubspot.com	2 Canal Park, Cambridge, MA 02141 USA (Tax ID: 20-2632791)	2023-04-27	2023-04-27	0	USD
-monday.com Ltd	monday.com - standard yearly recurring	IB23010019300		6 Yitzhak Sadeh Street, Tel Aviv 6777506, Israel	2023-01-10	2023-01-10	709.51	USD
-ngrok Inc.	Pro Annual	RCAWCSPDRY5-0014		548 Market St, PMB 26741, San Francisco, California 941, United States	2023-04-22	2023-04-22	960	
-Plaid Inc.	SERVICE FOR April 2023	S-EKV84K97PG-2304	accounts-receivable@plaid.com	1098 Harrison St, San Francisco, CA 94103, United States	2023-05-10	2023-05-10	4.95	USD
-Webflow, Inc.	4 Seat × Growth Workspace	1683590175		398 11th Street, 2nd Floor, San Francisco, CA 94103, United States	2023-05-08	2023-05-08	264.6	USD
-TOPLINE (LYAX0K)	WeWork All Access Plus membership plan	4002938285	we-us-55846@wework.com	1525 11th Ave Tenant LLC, 1525 11th Avenue, Seattle, WA 98122, USA	2023-05-01	Upon Receipt	209.3	USD
-Zoom Video Communications Inc.	Zoom One Pro Annual	INV192309245	mark@growtopline.com	55 Almaden Blvd, 6th Floor, San Jose, CA 95113	2023-03-09	2023-03-09	330.53	USD
+Vendor	Description	Invoice Number	From Email	From Address	Date Issued	Payment Due Date	Payment Status	Invoice Amount	Currency
+Crunchbase Inc.	Crunchbase Starter Annual	INV00604451	billing@crunchbase.com	564 Market Street Suite 700 San Francisco, CA 94104	2023-02-15	2023-02-15	PAID	348	USD
+Datadog	Datadog Subscription 01-APR-2023 - 30-APR-2023 4.996 On-Demand Indexed Log Events - 15 Days (Bundle of 1M) @ $12.74	ahm6vf3s	info@datadoghq.com	620 8th Avenue 45th floor New York, NY 10018	2023-05-09	2023-05-09	PAID	12.74	USD
+DigitalOcean LLC	Total usage charges for April 2023	457199991	elliot@growtopline.com	101 Avenue of the Americas, 2nd Floor, New York, NY 10013	2023-05-01	2023-05-01	UNPAID	837.32	USD
+Dwolla, Inc.	Platform Fee, Verified Business Customers, Verified Personal Customers, Ach Returns, Unauthorized Returns, Transfers, Verified Banks, Incoming Wires, Outgoing Wires, Next-Day Transfers, Same-Day Transfers, Active End Users, P2D, RTP Transfers	I-WJLXBRZ	accounting@dwolla.com	909 Locust St Suite 201, Des Moines, IA 50309	2023-05-08	2023-05-08	UNPAID	1250.7	USD
+Figma, Inc.	Professional FigJam seats (monthly), Professional Figma design seats (monthly)	054FF40B 0018	support@figma.com	760 Market Street, Floor 10, San Francisco, California 94102, United States	2023-05-02	2023-05-02	UNPAID	99.23	USD
+Avangate Inc dba 2Checkout	GlockApps Inbox Insight Monthly Subscription v2 Basic	BI56623780	info@2checkout.com	11700 Great Oaks Way no. 210, 30022 Alpharetta, Georgia	2023-05-06	2023-05-06	PAID	65.05	USD
+HubSpot Inc.	Sales Hub Professional (Includes 5 Users) Charge for: 4/27/2023 - 5/26/2023	10961084	billing@hubspot.com	2 Canal Park, Cambridge, MA 02141 USA	2023-04-27	2023-04-27	PAID	275.62	USD
+monday.com Ltd	monday.com - standard yearly recurring	IB23010019300		6 Yitzhak Sadeh Street, Tel Aviv 6777506, Israel	2023-01-10	2023-01-10	UNPAID	709.51	USD
+ngrok Inc.	Pro Annual, Pro Agents (included with license), Pro Domains and TCP Addresses (included with license), Peak TCP Connection Rate, Peak Simultaneous TCP Connections	RCAWCSPDRY5-0014	elliot@growtopline.com	548 Market St PMB 26741, San Francisco, California 941, United States	2023-04-22	2023-04-22	PAID	960	USD
+2 PLAID	SERVICE FOR April 2023	S-EKV84K97PG-2304	accounts-receivable@plaid.com	1098 Harrison St, San Francisco, CA 94103, United States	2023-05-10		UNPAID	4.95	USD
+Webflow, Inc.	4 Seat × Growth Workspace (at $60.00 / month), from May 8th 2023 to Jun 8th 2023	1683590175		398 11th Street, 2nd Floor, San Francisco, CA 94103, United States	2023-05-08	2023-05-08	PAID	264.6	USD
+Kelly-Springfield	WeWork All Access Plus membership plan	4002938285	we-us-55846@wework.com	1525 11th Ave Tenant LLC, 1525 11th Avenue, Seattle, WA 98122, USA	2023-05-01		UNPAID	209.3	USD
+Zoom Video Communications Inc.	Zoom One Pro Annual	INV192309245	mark@growtopline.com	55 Almaden Blvd, 6th Floor, San Jose, CA 95113	2023-03-09	2023-03-09	PAID	330.53	USD
