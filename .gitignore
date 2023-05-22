@@ -3,3 +3,4 @@ node_modules
 .envrc
 working/**/*.pdf
 working/cache/*
+working/output.tsv

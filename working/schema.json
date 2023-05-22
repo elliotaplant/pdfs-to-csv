@@ -4,7 +4,7 @@
   "properties": {
     "Vendor": {
       "type": "string",
-      "description": "The name of the vendor company who issued the invoice, not ‘Topline’"
+      "description": "The name of the vendor company who issued the invoice, not 'Topline'. Sometimes the vendor name is present in the email address of the company who issued the invoice, not emails with the '@growtopline.com' domain"
     },
     "Description": {
       "type": "string",
@@ -16,7 +16,7 @@
     },
     "From Email": {
       "type": "string",
-      "description": "The email address of the company who issued the invoice, not the email address of the receipt which has the growtopline.com domain",
+      "description": "The email address of the company who issued the invoice, not emails with the '@growtopline.com' domain",
       "format": "email"
     },
     "From Address": {
@@ -33,9 +33,9 @@
       "description": "The date payment is due, or the date issued if the payment is due upon receipt",
       "format": "date"
     },
-    "Payment Status": {
+    "Payment status": {
       "type": "string",
-      "enum": ["PAID", "UNPAID"],
+      "enum": ["PAID", "UNKNOWN"],
       "description": "The status of whether or not an invoice has been paid"
     },
     "Invoice Amount": {
@@ -47,6 +47,5 @@
       "description": "The three digit currency code for the total amount due",
       "pattern": "^[A-Z]{3}$"
     }
-  },
-  "required": ["success"]
+  }
 }
